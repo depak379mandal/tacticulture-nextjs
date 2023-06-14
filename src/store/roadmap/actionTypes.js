@@ -1,0 +1,5 @@
+/* Roadmap */
+
+export const GET_ROADMAP = "GET_ROADMAP"
+export const GET_ROADMAP_SUCCESS = "GET_ROADMAP_SUCCESS"
+export const GET_ROADMAP_FAIL = "GET_ROADMAP_FAIL"
