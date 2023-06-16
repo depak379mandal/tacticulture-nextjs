@@ -6,13 +6,7 @@ const Name = cell => {
   return cell.value ? cell.value : ""
 }
 
-// const PublishStatus = cell => {
-//   console.log(cell.value, "asdf")
-//   return "False"
-// }
-
 const PublishStatus = cell => {
-  console.log(cell, "uredoiyreui")
   switch (cell.value) {
     case true:
       return <Badge className="bg-success">Active</Badge>

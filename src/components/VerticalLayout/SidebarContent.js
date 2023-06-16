@@ -157,27 +157,12 @@ const SidebarContent = props => {
                 <span>{props.t("Users")}</span>
               </Link>
             </li>
-
             <li>
               <Link to="/events-list">
                 <i className="bx bxs-user-detail"></i>
                 <span>{props.t("Events")}</span>
               </Link>
             </li>
-
-            {/* <li>
-              <Link to="/notification-list">
-                <i className="bx bxs-user-detail"></i>
-                <span>{props.t("Notification")}</span>
-              </Link>
-            </li>
-
-            <li>
-              <Link to="/roadmap-list">
-                <i className="bx bxs-user-detail"></i>
-                <span>{props.t("Roadmap")}</span>
-              </Link>
-            </li> */}
           </ul>
         </div>
       </SimpleBar>

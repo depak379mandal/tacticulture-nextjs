@@ -1,6 +1,6 @@
 import { GET_EVENT_SUCCESS, GET_EVENT_FAIL } from "./actionTypes"
 
-const INIT_STATE = { event: [], error: {} }
+const INIT_STATE = { event: [], next: "", prev: "", error: {} }
 
 const events = (state = INIT_STATE, action) => {
   switch (action.type) {
@@ -8,6 +8,8 @@ const events = (state = INIT_STATE, action) => {
       return {
         ...state,
         event: action.payload.results,
+        next: action.payload.next,
+        prev: action.payload.previous,
       }
     case GET_EVENT_FAIL:
       return {

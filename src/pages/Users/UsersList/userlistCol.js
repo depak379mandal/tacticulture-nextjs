@@ -1,4 +1,10 @@
 import React from "react"
+import { Badge } from "reactstrap"
+
+const Id = cell => {
+  console.log({ cell })
+  return cell.value ? cell.value : ""
+}
 
 const FirstName = cell => {
   return cell.value ? cell.value : ""
@@ -11,8 +17,17 @@ const Email = cell => {
   return cell.value ? cell.value : ""
 }
 
+// const IsActive = cell => {
+//   return cell.value == 1 ? "Active" : "Inactive"
+// }
+
 const IsActive = cell => {
-  return cell.value == 1 ? "Active" : "Inactive"
+  switch (cell.value) {
+    case true:
+      return <Badge className="bg-success">Active</Badge>
+    case false:
+      return <Badge className="bg-danger">Inactive</Badge>
+  }
 }
 
 const Img = cell => {
@@ -33,4 +48,4 @@ const Img = cell => {
   )
 }
 
-export { FirstName, LastName, Email, Img, IsActive }
+export { Id, FirstName, LastName, Email, Img, IsActive }

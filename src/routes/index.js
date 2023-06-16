@@ -182,6 +182,8 @@ import RoadmapList from "../pages/Roadmap/Roadmap-list"
 import NotificationList from "../pages/Notification/notification-list"
 import AddUser from "pages/Users/AddUser/add-user"
 import AddEvent from "pages/Events/AddEvent/add-event"
+import UpdateUser from "pages/Users/UpdateUser/update-user"
+import ViewUser from "pages/Users/ViewUser/view-user"
 const authProtectedRoutes = [
   { path: "/dashboard", component: <Dashboard /> },
   { path: "/dashboard-saas", component: <DashboardSaas /> },
@@ -262,6 +264,8 @@ const authProtectedRoutes = [
   // Users
   { path: "/users-list", component: <UsersList /> },
   { path: "/add-user", component: <AddUser /> },
+  { path: "/update-user", component: <UpdateUser /> },
+  { path: "/view-user", component: <ViewUser /> },
 
   //Events
   { path: "/events-list", component: <EventsList /> },

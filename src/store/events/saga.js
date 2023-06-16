@@ -3,9 +3,9 @@ import { getEvents } from "../../helpers/events/backend_helper"
 import { GET_EVENT } from "./actionTypes"
 import { getEventFail, getEventSuccess } from "./actions"
 
-function* fetchTacticultureEvent() {
+function* fetchTacticultureEvent(page) {
   try {
-    const response = yield call(getEvents)
+    const response = yield call(getEvents, page.page)
     yield put(getEventSuccess(response))
   } catch (error) {
     yield put(getEventFail(error))

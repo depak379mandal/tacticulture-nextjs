@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from "react"
-import { useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import withRouter from "components/Common/withRouter"
 import TableContainer from "../../../components/Common/TableContainer"
 import {
@@ -8,18 +8,12 @@ import {
   Col,
   Container,
   Row,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  Label,
-  FormFeedback,
-  Input,
-  Form,
+  UncontrolledTooltip,
 } from "reactstrap"
 import * as Yup from "yup"
 import { useFormik } from "formik"
 
-import { FirstName, LastName, Email, IsActive } from "./userlistCol"
+import { FirstName, LastName, Email, IsActive, Id } from "./userlistCol"
 
 //Import Breadcrumb
 import Breadcrumbs from "components/Common/Breadcrumb"
@@ -91,38 +85,32 @@ const UsersList = props => {
   const handleOrderClick = arg => {
     dispatch(onUpdateUser(arg))
   }
-  // const { users } = useSelector(state => ({
-  //   users: state.User.user,
-  // }))
-  // useEffect(() => {
-  //   dispatch(getAllUser())
-  // }, [])
-  const { users, page } = useSelector(state => ({
-    users: state.User.user,
-    page: state.User.page,
-  }))
-  // console.log(users, page, "kjhdgkjfdhgkfsdjhgksfdhgskdfgh")
-  useEffect(() => {
-    dispatch(getAllUser())
-  }, [])
 
-  const nextFunc = () => {
-    dispatch(getAllUser(page))
+  const { users, next, previous } = useSelector(state => ({
+    users: state.User.user,
+    next: state.User.next,
+    previous: state.User.prev,
+  }))
+  console.log(users)
+  useEffect(() => {
+    const nextURL =
+      next && next.split("http://digimonk.live:2301/api/v1/admin")[1]
+    dispatch(getAllUser(nextURL || null))
+  }, [dispatch])
+
+  const nextPrevFunc = text => {
+    if (text == "next") {
+      dispatch(getAllUser(next))
+    } else if (text == "previous") {
+      dispatch(getAllUser(previous))
+    }
   }
 
-  // console.log(users, "userss", page)
-  const [userList, setUserList] = useState([])
   const [modal, setModal] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
 
   const columns = useMemo(
     () => [
-      {
-        Header: "#",
-        Cell: () => {
-          return <input type="checkbox" className="form-check-input" />
-        },
-      },
       {
         Header: "Img",
         // accessor: "name",
@@ -133,14 +121,14 @@ const UsersList = props => {
             {!cellProps.img ? (
               <div className="avatar-xs">
                 <span className="avatar-title rounded-circle">
-                  {/* {cellProps.display_name.charAt(0)} */}
+                  {cellProps.first_name.charAt(0)}
                 </span>
               </div>
             ) : (
               <div>
                 <img
                   className="rounded-circle avatar-xs"
-                  src={cellProps.profile_pic}
+                  src={cellProps.profile_image}
                   alt=""
                 />
               </div>
@@ -173,33 +161,65 @@ const UsersList = props => {
         },
       },
       {
-        Header: "Status",
-        // accessor: "status",
-        // filterable: true,
+        Header: "Active Status",
+        accessor: "is_active",
+        disableFilters: true,
         Cell: cellProps => {
-          // console.log(cellProps, "propf")
-          return (
-            <>
-              <button onClick={() => handleOrderClick(cellProps)}>
-                <div>{cellProps.status ? "Active" : "Inactive"}</div>
-              </button>
-            </>
-          )
+          return <IsActive {...cellProps} />
         },
       },
+
       {
         Header: "Action",
-        filterable: false,
+        accessor: "id",
+        disableFilters: true,
         Cell: cellProps => {
           return (
-            <>
-              <button onClick={() => handleOrderClick(cellProps)}>
-                <div>{cellProps.status ? "Active" : "Inactive"}</div>
-              </button>
-              <button onClick={() => handleOrderClick(cellProps)}>
-                <div>{cellProps.status ? "Active" : "Inactive"}</div>
-              </button>
-            </>
+            <ul className="list-unstyled hstack gap-1 mb-0">
+              <li data-bs-toggle="tooltip" data-bs-placement="top" title="View">
+                <Link
+                  to={`/view-user/${cellProps.value}`}
+                  className="btn btn-sm btn-soft-primary"
+                >
+                  <i className="mdi mdi-eye-outline" id="viewtooltip"></i>
+                </Link>
+              </li>
+              <UncontrolledTooltip placement="top" target="viewtooltip">
+                View
+              </UncontrolledTooltip>
+
+              <li>
+                <Link
+                  to={`/update-user/${cellProps.value}`}
+                  className="btn btn-sm btn-soft-info"
+                  // onClick={() => {
+                  //   const jobData = cellProps.row.original
+                  //   handleJobClick(jobData)
+                  // }}
+                >
+                  <i className="mdi mdi-pencil-outline" id="edittooltip" />
+                  <UncontrolledTooltip placement="top" target="edittooltip">
+                    Edit
+                  </UncontrolledTooltip>
+                </Link>
+              </li>
+
+              <li>
+                <Link
+                  to="#"
+                  className="btn btn-sm btn-soft-danger"
+                  onClick={() => {
+                    const jobData = cellProps.row.original
+                    onClickDelete(jobData)
+                  }}
+                >
+                  <i className="mdi mdi-delete-outline" id="deletetooltip" />
+                  <UncontrolledTooltip placement="top" target="deletetooltip">
+                    Delete
+                  </UncontrolledTooltip>
+                </Link>
+              </li>
+            </ul>
           )
         },
       },
@@ -302,6 +322,8 @@ const UsersList = props => {
                     isAddEventList={false}
                     handleClick={handleUserClicks}
                     fetchData={() => console.log()}
+                    fetchNextData={() => nextPrevFunc("next")}
+                    fetchOldData={() => nextPrevFunc("previous")}
                     customPageSize={1}
                     className="custom-header-css"
                   />

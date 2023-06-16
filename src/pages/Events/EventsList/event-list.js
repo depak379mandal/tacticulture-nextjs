@@ -32,12 +32,24 @@ const EventList = props => {
   const dispatch = useDispatch()
   const [contact, setContact] = useState()
 
-  const { events } = useSelector(state => ({
+  const { events, next, previous } = useSelector(state => ({
     events: state.Event.event,
+    next: state.Event.next,
+    previous: state.Event.prev,
   }))
   useEffect(() => {
-    dispatch(getEvent())
-  }, [])
+    const nextURL =
+      next && next.split("http://digimonk.live:2301/api/v1/admin")[1]
+    dispatch(getEvent(nextURL || null))
+  }, [dispatch])
+
+  const nextPrevFunc = text => {
+    if (text == "next") {
+      dispatch(getEvent(next))
+    } else if (text == "previous") {
+      dispatch(getEvent(previous))
+    }
+  }
 
   const [modal, setModal] = useState(false)
   const [isEdit, setIsEdit] = useState(false)
@@ -216,6 +228,8 @@ const EventList = props => {
                     isAddEventList={true}
                     handleClick={handleEventClicks}
                     fetchData={() => console.log()}
+                    fetchNextData={() => nextPrevFunc("next")}
+                    fetchOldData={() => nextPrevFunc("previous")}
                     customPageSize={10}
                     className="custom-header-css"
                   />

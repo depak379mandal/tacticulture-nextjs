@@ -1,6 +1,6 @@
 import { GET_USER_SUCCESS, GET_USER_FAIL } from "./actionTypes"
 
-const INIT_STATE = { user: [], page: "", error: {} }
+const INIT_STATE = { user: [], next: "", prev: "", error: {} }
 // const INIT_STATE = { user: [], error: {} }
 
 const users = (state = INIT_STATE, action) => {
@@ -9,7 +9,8 @@ const users = (state = INIT_STATE, action) => {
       return {
         ...state,
         user: action.payload.results,
-        page: action.payload.next,
+        next: action.payload.next,
+        prev: action.payload.previous,
       }
     case GET_USER_FAIL:
       return {
