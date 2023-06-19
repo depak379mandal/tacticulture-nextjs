@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from "react"
+import React, { useEffect, useMemo } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import withRouter from "components/Common/withRouter"
 import TableContainer from "../../../components/Common/TableContainer"
@@ -17,29 +17,24 @@ import { Name, PublishStatus } from "./eventlistCol"
 import Breadcrumbs from "components/Common/Breadcrumb"
 import DeleteModal from "components/Common/DeleteModal"
 
-import { getEvent as onGetEvents } from "store/events/actions"
-import { isEmpty } from "lodash"
-
 //redux
 import { useSelector, useDispatch } from "react-redux"
 import { getEvent } from "store/actions"
-import { Status } from "pages/Crypto/CryptoOrders/CryptoCol"
+import API_URL from "helpers/api_helper"
 
 const EventList = props => {
   //meta title
   document.title = "Event List | Tacticulture Admin"
 
   const dispatch = useDispatch()
-  const [contact, setContact] = useState()
-
   const { events, next, previous } = useSelector(state => ({
     events: state.Event.event,
     next: state.Event.next,
     previous: state.Event.prev,
   }))
+
   useEffect(() => {
-    const nextURL =
-      next && next.split("http://digimonk.live:2301/api/v1/admin")[1]
+    const nextURL = next && next.split(API_URL)[1]
     dispatch(getEvent(nextURL || null))
   }, [dispatch])
 
@@ -50,9 +45,6 @@ const EventList = props => {
       dispatch(getEvent(previous))
     }
   }
-
-  const [modal, setModal] = useState(false)
-  const [isEdit, setIsEdit] = useState(false)
 
   const columns = useMemo(
     () => [
@@ -128,90 +120,13 @@ const EventList = props => {
     []
   )
 
-  useEffect(() => {
-    if (events && !events.length) {
-      dispatch(onGetEvents())
-      setIsEdit(false)
-    }
-  }, [dispatch, events])
-
-  useEffect(() => {
-    setContact(events)
-    setIsEdit(false)
-  }, [events])
-
-  useEffect(() => {
-    if (!isEmpty(events) && !!isEdit) {
-      setContact(events)
-      setIsEdit(false)
-    }
-  }, [events])
-
-  const toggle = () => {
-    setModal(!modal)
-  }
-
-  const handleUserClick = arg => {
-    const user = arg
-
-    setContact({
-      id: user.id,
-      name: user.name,
-      designation: user.designation,
-      email: user.email,
-      tags: user.tags,
-      projects: user.projects,
-    })
-    setIsEdit(true)
-
-    toggle()
-  }
-
-  var node = useRef()
-  const onPaginationPageChange = page => {
-    if (
-      node &&
-      node.current &&
-      node.current.props &&
-      node.current.props.pagination &&
-      node.current.props.pagination.options
-    ) {
-      node.current.props.pagination.options.onPageChange(page)
-    }
-  }
-
-  //delete customer
-  const [deleteModal, setDeleteModal] = useState(false)
-
-  const onClickDelete = events => {
-    setContact(events)
-    setDeleteModal(true)
-  }
-
-  const handleDeleteUser = () => {
-    if (contact && contact.id) {
-      dispatch(onDeleteUser(contact.id))
-    }
-    onPaginationPageChange(1)
-    setDeleteModal(false)
-  }
   const navigate = useNavigate()
   const handleEventClicks = () => {
-    // setUserList("")
-    // setIsEdit(false)
-    // toggle()
     navigate("/add-event")
   }
 
-  const keyField = "id"
-
   return (
     <React.Fragment>
-      <DeleteModal
-        show={deleteModal}
-        onDeleteClick={handleDeleteUser}
-        onCloseClick={() => setDeleteModal(false)}
-      />
       <div className="page-content">
         <Container fluid>
           {/* Render Breadcrumbs */}

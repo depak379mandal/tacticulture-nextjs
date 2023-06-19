@@ -2,7 +2,6 @@ import React from "react"
 import { Badge } from "reactstrap"
 
 const Name = cell => {
-  console.log(cell, "fghnfdkjg")
   return cell.value ? cell.value : ""
 }
 

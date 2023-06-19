@@ -8,7 +8,7 @@ const token = Authorization()
 
 //apply base url for axios
 const API_URL = "http://digimonk.live:2301/api/v1/admin"
-console.log
+
 const axiosApi = axios.create({
   baseURL: API_URL,
 })
@@ -41,3 +41,4 @@ export async function del(url, config = {}) {
     .delete(url, { ...config })
     .then(response => response.data)
 }
+export default API_URL

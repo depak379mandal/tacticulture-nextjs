@@ -1,32 +1,33 @@
 import React from "react"
 
-import {
-  Form,
-  Card,
-  CardBody,
-  Col,
-  Row,
-  Container,
-  Label,
-  Input,
-  Button,
-  FormGroup,
-} from "reactstrap"
+import { Card, CardBody, Col, Row, Container } from "reactstrap"
 
-// Form Editor
-import { Editor } from "react-draft-wysiwyg"
 //Import Breadcrumb
 import Breadcrumbs from "../../../components/Common/Breadcrumb"
+import { useParams } from "react-router-dom"
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { getUserDetails } from "store/user/action"
 
 const ViewUser = () => {
   //meta title
-  document.title = "Add User | Tacticulture Admin"
+  document.title = "View User | Tacticulture Admin"
+
+  const dispatch = useDispatch()
+
+  const { id } = useParams()
+  const { user } = useSelector(state => ({
+    user: state.User.userDetail,
+  }))
+  useEffect(() => {
+    dispatch(getUserDetails(id))
+  }, [dispatch])
 
   return (
     <React.Fragment>
       <div className="page-content">
         <Container fluid={true}>
-          <Breadcrumbs title="Users" breadcrumbItem="Add User" />
+          <Breadcrumbs title="Users" breadcrumbItem="View User Details" />
 
           <Row>
             <Col>
@@ -37,15 +38,9 @@ const ViewUser = () => {
                       htmlFor="example-text-input"
                       className="col-md-2 col-form-label"
                     >
-                      FirstName
+                      FirstName :
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="text"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.first_name}</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -54,13 +49,7 @@ const ViewUser = () => {
                     >
                       LastName
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="text"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.last_name}</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -69,13 +58,7 @@ const ViewUser = () => {
                     >
                       Email
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="email"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.email}</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -84,13 +67,7 @@ const ViewUser = () => {
                     >
                       Username
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="url"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.username}</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -99,53 +76,20 @@ const ViewUser = () => {
                     >
                       Telephone
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="tel"
-                        defaultValue=""
-                      />
-                    </div>
-                  </Row>
-                  <Row className="mb-3">
-                    <label
-                      htmlFor="example-password-input"
-                      className="col-md-2 col-form-label"
-                    >
-                      Password
-                    </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="password"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.phone_number}</div>
                   </Row>
 
                   <Row className="mb-3">
                     <label className="col-md-2 col-form-label">
                       Default Role
                     </label>
-                    <div className="col-md-10">
-                      <select className="form-control">
-                        <option>Select</option>
-                        <option>apprentice</option>
-                        <option>instructor</option>
-                      </select>
-                    </div>
+                    <div className="col-md-10">{user?.default_profile}</div>
                   </Row>
                   <Row className="mb-3">
                     <label className="col-md-2 col-form-label">
                       Profile Image
                     </label>
-                    <div className="col-md-10">
-                      <Input
-                        className="form-control"
-                        type="file"
-                        id="formFile"
-                      />
-                    </div>
+                    <div className="col-md-10">profile img will show later</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -154,13 +98,7 @@ const ViewUser = () => {
                     >
                       Address
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="text"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.address}</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -169,13 +107,7 @@ const ViewUser = () => {
                     >
                       City
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="text"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.city}</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -184,13 +116,7 @@ const ViewUser = () => {
                     >
                       ZipCode
                     </label>
-                    <div className="col-md-10">
-                      <input
-                        className="form-control"
-                        type="text"
-                        defaultValue=""
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.zip_code}</div>
                   </Row>
                   <Row className="mb-3">
                     <label
@@ -199,24 +125,8 @@ const ViewUser = () => {
                     >
                       Bio
                     </label>
-                    <div className="col-md-10">
-                      <Editor
-                        toolbarClassName="toolbarClassName"
-                        wrapperClassName="wrapperClassName"
-                        editorClassName="editorClassName"
-                      />
-                    </div>
+                    <div className="col-md-10">{user?.bio}</div>
                   </Row>
-                  <FormGroup className="mb-0">
-                    <div>
-                      <Button type="submit" color="primary" className="ms-1">
-                        Submit
-                      </Button>
-                      <Button type="reset" color="secondary">
-                        Reset
-                      </Button>
-                    </div>
-                  </FormGroup>
                 </CardBody>
               </Card>
             </Col>

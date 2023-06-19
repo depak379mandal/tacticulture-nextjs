@@ -10,17 +10,14 @@ import {
   Row,
   UncontrolledTooltip,
 } from "reactstrap"
-import * as Yup from "yup"
-import { useFormik } from "formik"
+import API_URL from "../../../helpers/api_helper"
 
 import { FirstName, LastName, Email, IsActive, Id } from "./userlistCol"
 
 //Import Breadcrumb
 import Breadcrumbs from "components/Common/Breadcrumb"
-import DeleteModal from "components/Common/DeleteModal"
 
-import { getAllUser, getAllUser as onGetUsers } from "store/user/action"
-import { isEmpty } from "lodash"
+import { getAllUser } from "store/user/action"
 
 //redux
 import { useSelector, useDispatch } from "react-redux"
@@ -30,71 +27,14 @@ const UsersList = props => {
   document.title = "User List | Tacticulture Admin"
 
   const dispatch = useDispatch()
-  const [contact, setContact] = useState()
-  // validation
-  const validation = useFormik({
-    // enableReinitialize : use this flag when initial values needs to be changed
-    enableReinitialize: true,
-
-    initialValues: {
-      name: (contact && contact.name) || "",
-      designation: (contact && contact.designation) || "",
-      tags: (contact && contact.tags) || "",
-      email: (contact && contact.email) || "",
-      projects: (contact && contact.projects) || "",
-    },
-    validationSchema: Yup.object({
-      name: Yup.string().required("Please Enter Your Name"),
-      designation: Yup.string().required("Please Enter Your Designation"),
-      tags: Yup.array().required("Please Enter Tag"),
-      email: Yup.string()
-        .matches(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Please Enter Valid Email")
-        .required("Please Enter Your Email"),
-      projects: Yup.string().required("Please Enter Your Project"),
-    }),
-    onSubmit: values => {
-      if (isEdit) {
-        const updateUser = {
-          id: contact.id,
-          name: values.name,
-          designation: values.designation,
-          tags: values.tags,
-          email: values.email,
-          projects: values.projects,
-        }
-        // update user
-        dispatch(onUpdateUser(updateUser))
-        setIsEdit(false)
-        validation.resetForm()
-      } else {
-        const newUser = {
-          id: Math.floor(Math.random() * (30 - 20)) + 20,
-          name: values["name"],
-          designation: values["designation"],
-          email: values["email"],
-          tags: values["tags"],
-          projects: values["projects"],
-        }
-        // save new user
-        dispatch(onAddNewUser(newUser))
-        validation.resetForm()
-      }
-      toggle()
-    },
-  })
-  const handleOrderClick = arg => {
-    dispatch(onUpdateUser(arg))
-  }
 
   const { users, next, previous } = useSelector(state => ({
     users: state.User.user,
     next: state.User.next,
     previous: state.User.prev,
   }))
-  console.log(users)
   useEffect(() => {
-    const nextURL =
-      next && next.split("http://digimonk.live:2301/api/v1/admin")[1]
+    const nextURL = next && next.split(API_URL)[1]
     dispatch(getAllUser(nextURL || null))
   }, [dispatch])
 
@@ -105,9 +45,6 @@ const UsersList = props => {
       dispatch(getAllUser(previous))
     }
   }
-
-  const [modal, setModal] = useState(false)
-  const [isEdit, setIsEdit] = useState(false)
 
   const columns = useMemo(
     () => [
@@ -227,73 +164,6 @@ const UsersList = props => {
     []
   )
 
-  useEffect(() => {
-    if (users && !users.length) {
-      dispatch(onGetUsers())
-      setIsEdit(false)
-    }
-  }, [dispatch, users])
-
-  useEffect(() => {
-    setContact(users)
-    setIsEdit(false)
-  }, [users])
-
-  useEffect(() => {
-    if (!isEmpty(users) && !!isEdit) {
-      setContact(users)
-      setIsEdit(false)
-    }
-  }, [users])
-
-  const toggle = () => {
-    setModal(!modal)
-  }
-
-  const handleUserClick = arg => {
-    const user = arg
-
-    setContact({
-      id: user.id,
-      name: user.name,
-      designation: user.designation,
-      email: user.email,
-      tags: user.tags,
-      projects: user.projects,
-    })
-    setIsEdit(true)
-
-    toggle()
-  }
-
-  var node = useRef()
-  const onPaginationPageChange = page => {
-    if (
-      node &&
-      node.current &&
-      node.current.props &&
-      node.current.props.pagination &&
-      node.current.props.pagination.options
-    ) {
-      node.current.props.pagination.options.onPageChange(page)
-    }
-  }
-
-  //delete customer
-  const [deleteModal, setDeleteModal] = useState(false)
-
-  const onClickDelete = users => {
-    setContact(users)
-    setDeleteModal(true)
-  }
-
-  const handleDeleteUser = () => {
-    if (contact && contact.id) {
-      dispatch(onDeleteUser(contact.id))
-    }
-    onPaginationPageChange(1)
-    setDeleteModal(false)
-  }
   const navigate = useNavigate()
   const handleUserClicks = () => {
     navigate("/add-user")
@@ -301,11 +171,6 @@ const UsersList = props => {
 
   return (
     <React.Fragment>
-      <DeleteModal
-        show={deleteModal}
-        onDeleteClick={handleDeleteUser}
-        onCloseClick={() => setDeleteModal(false)}
-      />
       <div className="page-content">
         <Container fluid>
           {/* Render Breadcrumbs */}

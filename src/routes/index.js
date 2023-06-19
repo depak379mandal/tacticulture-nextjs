@@ -264,8 +264,8 @@ const authProtectedRoutes = [
   // Users
   { path: "/users-list", component: <UsersList /> },
   { path: "/add-user", component: <AddUser /> },
-  { path: "/update-user", component: <UpdateUser /> },
-  { path: "/view-user", component: <ViewUser /> },
+  { path: "/update-user/:id", component: <UpdateUser /> },
+  { path: "/view-user/:id", component: <ViewUser /> },
 
   //Events
   { path: "/events-list", component: <EventsList /> },

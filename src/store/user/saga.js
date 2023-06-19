@@ -1,8 +1,24 @@
 import { call, put, takeEvery } from "redux-saga/effects"
-import { getAllUsers } from "../../helpers/users/backend_helper"
-import { GET_USER } from "./actionTypes"
-import { getAllUserFail, getAllUserSuccess } from "./action"
-// import axios from "axios"
+import {
+  getAllUsers,
+  getUserDetail,
+  addNewUser,
+} from "../../helpers/users/backend_helper"
+import {
+  ADD_NEW_USER,
+  GET_USER,
+  GET_USER_DETAIL,
+  UPDATE_USER,
+} from "./actionTypes"
+import {
+  addNewUserFail,
+  addNewUserSuccess,
+  getAllUserFail,
+  getAllUserSuccess,
+  getUserDetailsFail,
+  getUserDetailsSuccess,
+} from "./action"
+import { updateUser, updateUserFail, updateUserSuccess } from "store/actions"
 
 function* fetchTacticultureUser(page) {
   try {
@@ -13,8 +29,39 @@ function* fetchTacticultureUser(page) {
   }
 }
 
+function* fetchTacticultureUserDetail({ userId }) {
+  try {
+    const response = yield call(getUserDetail, userId)
+    yield put(getUserDetailsSuccess(response))
+  } catch (error) {
+    yield put(getUserDetailsFail(error))
+  }
+}
+
+function* tacticulturAddNewUser({ payload: user }) {
+  console.log(user, "useruseruseruseruseruseruseruser")
+  try {
+    const response = yield call(addNewUser, user)
+    yield put(addNewUserSuccess(response))
+  } catch (error) {
+    yield put(addNewUserFail(error))
+  }
+}
+
+function* tacticultureUpdateUser({ payload: user }) {
+  try {
+    const response = yield call(updateUser, user)
+    yield put(updateUserSuccess(response))
+  } catch (error) {
+    yield put(updateUserFail(error))
+  }
+}
+
 function* tacticultureUserSaga() {
   yield takeEvery(GET_USER, fetchTacticultureUser)
+  yield takeEvery(GET_USER_DETAIL, fetchTacticultureUserDetail)
+  yield takeEvery(ADD_NEW_USER, tacticulturAddNewUser)
+  yield takeEvery(UPDATE_USER, tacticultureUpdateUser)
 }
 
 export default tacticultureUserSaga
