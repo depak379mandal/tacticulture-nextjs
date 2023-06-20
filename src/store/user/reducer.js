@@ -12,7 +12,7 @@ import {
 const INIT_STATE = { user: [], next: "", prev: "", error: {} }
 
 const users = (state = INIT_STATE, action) => {
-  console.log(action)
+  // console.log(action)
   switch (action.type) {
     case GET_USER_SUCCESS:
       return {

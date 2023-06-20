@@ -39,11 +39,11 @@ function* fetchTacticultureUserDetail({ userId }) {
 }
 
 function* tacticulturAddNewUser({ payload: user }) {
-  console.log(user, "useruseruseruseruseruseruseruser")
   try {
     const response = yield call(addNewUser, user)
     yield put(addNewUserSuccess(response))
   } catch (error) {
+    console.log("error", error)
     yield put(addNewUserFail(error))
   }
 }

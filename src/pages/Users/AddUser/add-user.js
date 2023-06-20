@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   Button,
   Form,
 } from "reactstrap"
-
+import Select from "react-select"
 // Form Editor
 import { Editor } from "react-draft-wysiwyg"
 //Import Breadcrumb
@@ -19,13 +19,26 @@ import Breadcrumbs from "../../../components/Common/Breadcrumb"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { addUser } from "store/user/action"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
+import Cropmodal from "pages/Modal/Cropmodal"
+// image
+import Avtar_image from "../../../assets/images/users/avatar-1.jpg"
+//css
+import "../../../assets/scss/custom/pages/_add-user.scss"
+import { getEventCategory } from "store/events/actions"
+
 const AddUser = () => {
   //meta title
   document.title = "Add User | Tacticulture Admin"
 
   // redux dispatch
   const dispatch = useDispatch()
+  const { user, error } = useSelector(state => state.User)
+  const { category } = useSelector(state => state.Event)
+
+  //navigate
+  const navigate = useNavigate()
 
   // validation
   const validation = useFormik({
@@ -55,7 +68,7 @@ const AddUser = () => {
       username: Yup.string(),
       phone_number: Yup.string(),
       default_profile: Yup.string(),
-      password: Yup.string(),
+      password: Yup.string().required("Please Enter Your password"),
       address: Yup.string(),
       city: Yup.string(),
       zip_code: Yup.string(),
@@ -64,7 +77,6 @@ const AddUser = () => {
     }),
 
     onSubmit: values => {
-      console.log("ttttttttttttttttttt", values)
       const newUser = {
         first_name: values["first_name"],
         last_name: values["last_name"],
@@ -75,19 +87,74 @@ const AddUser = () => {
         password: values["password"],
         address: values["address"],
         city: values["city"],
-        profile_image: values["profile_image"],
+        profile_image: values["profile_image"] ? values["profile_image"] : null,
         zip_code: values["zip_code"],
         bio: values["bio"],
       }
-      console.log(newUser, "[[[[[[[[[[[[[[[[[[[[[[[[[[")
       // save new user
       dispatch(addUser(newUser))
-      validation.resetForm()
-
+      if (user) {
+        navigate("/users-list")
+      }
+      // validation.resetForm()
       toggle()
     },
   })
-  console.log(validation)
+  useEffect(() => {
+    dispatch(getEventCategory())
+  }, [])
+
+  useEffect(() => {
+    if (error.message) {
+      const convertedErrors = {}
+      Object.entries(error.response.data)
+        .map(([key, value]) => {
+          return {
+            [key]: value.join(),
+          }
+        })
+        .forEach(error => {
+          const field = Object.keys(error)[0] // Get the field name
+          const message = error[field] // Get the error message
+          convertedErrors[field] = message
+        })
+      validation.setErrors(convertedErrors)
+    }
+  }, [error])
+  /* profile Image cropper */
+  const [pest, setPest] = useState("")
+  const [tempImage, setTempImage] = useState("")
+  const [modalShow, setModalShow] = React.useState(false)
+  const onChange = e => {
+    e.preventDefault()
+    let files
+    if (e.dataTransfer) {
+      files = e.dataTransfer.files
+    } else if (e.target) {
+      files = e.target.files
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setImage(reader.result)
+    }
+    reader.readAsDataURL(files[0])
+  }
+
+  // const getCropData = async () => {
+  //   if (typeof cropper !== "undefined") {
+  //     setCropData(cropper.getCroppedCanvas().toDataURL())
+  //   }
+  // }
+  const [selectedMulti, setselectedMulti] = useState(null)
+  function handleMulti(selectedMulti) {
+    setselectedMulti(selectedMulti)
+  }
+
+  const newOptions = category.map(item => ({
+    label: item.event_categories,
+    value: item.id,
+  }))
+
   return (
     <React.Fragment>
       <div className="page-content">
@@ -128,6 +195,10 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.first_name &&
+                            validation.errors.first_name}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -153,6 +224,10 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.last_name &&
+                            validation.errors.last_name}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -177,6 +252,9 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.email && validation.errors.email}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -202,6 +280,10 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.username &&
+                            validation.errors.username}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -227,6 +309,10 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.phone_number &&
+                            validation.errors.phone_number}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -252,6 +338,10 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.password &&
+                            validation.errors.password}
+                        </span>
                       </div>
                     </Row>
 
@@ -274,9 +364,13 @@ const AddUser = () => {
                           <option>apprentice</option>
                           <option>instructor</option>
                         </select>
+                        <span className="text-danger">
+                          {validation.touched.default_profile &&
+                            validation.errors.default_profile}
+                        </span>
                       </div>
                     </Row>
-                    <Row className="mb-3">
+                    {/* <Row className="mb-3">
                       <label className="col-md-2 col-form-label">
                         Profile Image
                       </label>
@@ -286,6 +380,47 @@ const AddUser = () => {
                           type="file"
                           id="formFile"
                         />
+                      </div>
+                    </Row> */}
+                    <Row className="mb-3">
+                      <label className="col-md-2 col-form-label">
+                        Profile Image
+                      </label>
+                      <div className="col-md-10">
+                        {/* <Input
+                        className="form-control"
+                        type="file"
+                        id="formFile"
+                      />
+                      /> */}
+
+                        <div className="">
+                          <div className="">
+                            <img
+                              src={pest ? pest : Avtar_image}
+                              className="profile_image_adduser"
+                              alt="image"
+                            />
+                          </div>
+
+                          <input
+                            type="file"
+                            id="actual-btn"
+                            onChange={e => {
+                              if (e.target.files.length > 0) {
+                                setTempImage(e)
+                                setModalShow(true)
+                              }
+                            }}
+                            hidden
+                          />
+                          <label
+                            htmlFor="actual-btn"
+                            className="select_image_button"
+                          >
+                            Choose Image
+                          </label>
+                        </div>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -311,6 +446,10 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.address &&
+                            validation.errors.address}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -335,6 +474,9 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.city && validation.errors.city}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -360,6 +502,29 @@ const AddUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.zip_code &&
+                            validation.errors.zip_code}
+                        </span>
+                      </div>
+                    </Row>
+                    <Row className="mb-3">
+                      <label
+                        htmlFor="example-text-input"
+                        className="col-md-2 col-form-label"
+                      >
+                        Event Interest
+                      </label>
+                      <div className="col-md-10">
+                        <Select
+                          value={selectedMulti}
+                          isMulti={true}
+                          onChange={() => {
+                            handleMulti()
+                          }}
+                          options={newOptions}
+                          className="select2-selection"
+                        />
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -382,8 +547,12 @@ const AddUser = () => {
                           //   validation.setFieldValue("bio", e.target.value)
                           // }
                         />
+                        <span className="text-danger">
+                          {validation.touched.bio && validation.errors.bio}
+                        </span>
                       </div>
                     </Row>
+
                     <div>
                       <Button type="submit" color="primary" className="ms-1">
                         Submit
@@ -399,6 +568,14 @@ const AddUser = () => {
           </Row>
         </Container>
       </div>
+      <Cropmodal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        pest={pest}
+        tempImage={tempImage}
+        setTempImage={setTempImage}
+        setPest={setPest}
+      />
     </React.Fragment>
   )
 }
