@@ -36,6 +36,25 @@ const UpdateUser = () => {
     dispatch(getUserDetails(id))
   }, [dispatch])
 
+  function replaceNullsWithEmptyStrings(obj) {
+    for (let key in obj) {
+      if (obj[key] === null) {
+        obj[key] = ""
+      } else if (typeof obj[key] === "object" && obj[key] !== null) {
+        replaceNullsWithEmptyStrings(obj[key])
+      }
+    }
+    return obj
+  }
+  useEffect(() => {
+    if (user) {
+      const newUser = replaceNullsWithEmptyStrings(user)
+      console.log(newUser)
+
+      validation.setValues(replaceNullsWithEmptyStrings(user))
+    }
+  }, [user])
+
   // validation
   const validation = useFormik({
     // enableReinitialize : use this flag when initial values needs to be changed
@@ -73,7 +92,6 @@ const UpdateUser = () => {
     }),
 
     onSubmit: values => {
-      console.log("ttttttttttttttttttt", values)
       const updateUser = {
         first_name: values["first_name"],
         last_name: values["last_name"],
@@ -84,7 +102,7 @@ const UpdateUser = () => {
         password: values["password"],
         address: values["address"],
         city: values["city"],
-        profile_image: values["profile_image"],
+        profile_image: values["profile_image"] ? values["profile_image"] : null,
         zip_code: values["zip_code"],
         bio: values["bio"],
       }
@@ -126,7 +144,7 @@ const UpdateUser = () => {
                           name="first_name"
                           className="form-control"
                           type="text"
-                          value={user?.first_name}
+                          value={validation.values?.first_name}
                           placeholder="Insert First Name"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -151,7 +169,7 @@ const UpdateUser = () => {
                           name="last_name"
                           className="form-control"
                           type="text"
-                          value={user?.last_name}
+                          value={validation.values?.last_name}
                           placeholder="Insert Last Name"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -176,7 +194,7 @@ const UpdateUser = () => {
                           name="email"
                           className="form-control"
                           type="email"
-                          value={user?.email}
+                          value={validation.values?.email}
                           placeholder="Insert Email"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -200,7 +218,7 @@ const UpdateUser = () => {
                           name="username"
                           className="form-control"
                           type="url"
-                          value={user?.username}
+                          value={validation.values?.username}
                           placeholder="Insert Username"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -225,7 +243,7 @@ const UpdateUser = () => {
                           name="phone_number"
                           className="form-control"
                           type="tel"
-                          value={user?.phone_number}
+                          value={validation.values?.phone_number}
                           placeholder="Insert Phone Number"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -245,7 +263,7 @@ const UpdateUser = () => {
                       </label>
                       <div className="col-md-10">
                         <select
-                          value={user?.default_profile}
+                          value={validation.values?.default_profile}
                           onChange={e =>
                             validation.setFieldValue(
                               "default_profile",
@@ -284,7 +302,7 @@ const UpdateUser = () => {
                           name="address"
                           className="form-control"
                           type="text"
-                          value={user?.address}
+                          value={validation.values?.address}
                           placeholder="Insert Address"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -309,7 +327,7 @@ const UpdateUser = () => {
                           name="city"
                           className="form-control"
                           type="text"
-                          value={user?.city}
+                          value={validation.values?.city}
                           placeholder="Insert City"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -333,7 +351,7 @@ const UpdateUser = () => {
                           name="zip_code"
                           className="form-control"
                           type="text"
-                          value={user?.zip_code}
+                          value={validation.values?.zip_code}
                           placeholder="Insert ZipCode"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}

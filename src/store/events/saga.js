@@ -14,7 +14,6 @@ import {
 function* fetchTacticultureEvent(page) {
   try {
     const response = yield call(getEvents, page.page)
-    console.log(response, "eeeeeeeeeeeeeeeeeeeeeee")
     yield put(getEventSuccess(response))
   } catch (error) {
     yield put(getEventFail(error))
@@ -23,7 +22,6 @@ function* fetchTacticultureEvent(page) {
 function* fetchTacticultureEventCategory() {
   try {
     const response = yield call(getEventCategories)
-    console.log(response, "rrrrrrrrrrrrrrrrrrrrrrrrrr")
     yield put(getEventCategorySuccess(response))
   } catch (error) {
     yield put(getEventCategoryFail(error))

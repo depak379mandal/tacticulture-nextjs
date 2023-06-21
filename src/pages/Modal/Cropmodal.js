@@ -36,6 +36,11 @@ const Cropmodal = props => {
     if (typeof cropper !== "undefined") {
       setCropData(cropper.getCroppedCanvas().toDataURL())
       props.setPest(cropper.getCroppedCanvas().toDataURL())
+      // props.validation.setFieldValue(
+      //   "profile_image",
+      //   cropper.getCroppedCanvas().toDataURL()
+      // )
+      props.onImageChange(cropper.getCroppedCanvas().toDataURL())
 
       props.onHide()
     }

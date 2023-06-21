@@ -58,6 +58,7 @@ const AddUser = () => {
       profile_image: "",
       zip_code: "",
       bio: "",
+      events: [],
     },
     validationSchema: Yup.object({
       first_name: Yup.string(),
@@ -74,6 +75,7 @@ const AddUser = () => {
       zip_code: Yup.string(),
       bio: Yup.string(),
       profile_image: Yup.string(),
+      events: Yup.array().max(10, "Only 10 categories are allowed"),
     }),
 
     onSubmit: values => {
@@ -90,6 +92,7 @@ const AddUser = () => {
         profile_image: values["profile_image"] ? values["profile_image"] : null,
         zip_code: values["zip_code"],
         bio: values["bio"],
+        events: values["events"],
       }
       // save new user
       dispatch(addUser(newUser))
@@ -125,6 +128,7 @@ const AddUser = () => {
   const [pest, setPest] = useState("")
   const [tempImage, setTempImage] = useState("")
   const [modalShow, setModalShow] = React.useState(false)
+  console.log(pest, "kskdjhgihfgh")
   const onChange = e => {
     e.preventDefault()
     let files
@@ -150,11 +154,12 @@ const AddUser = () => {
     setselectedMulti(selectedMulti)
   }
 
-  const newOptions = category.map(item => ({
+  const newOptions = category?.map(item => ({
     label: item.event_categories,
     value: item.id,
   }))
-
+  const [bio, setBio] = useState("")
+  console.log(validation)
   return (
     <React.Fragment>
       <div className="page-content">
@@ -517,10 +522,16 @@ const AddUser = () => {
                       </label>
                       <div className="col-md-10">
                         <Select
+                          name="events"
                           value={selectedMulti}
                           isMulti={true}
-                          onChange={() => {
-                            handleMulti()
+                          onChange={val => {
+                            // console.log("val", val)
+                            handleMulti(val)
+                            validation.setFieldValue(
+                              "events",
+                              val.map(item => item.value)
+                            )
                           }}
                           options={newOptions}
                           className="select2-selection"
@@ -539,12 +550,17 @@ const AddUser = () => {
                           toolbarClassName="toolbarClassName"
                           wrapperClassName="wrapperClassName"
                           editorClassName="editorClassName"
+                          // initialContentState={validation.values.bio}
                           // value={validation.values.bio}
                           // onChange={
                           //   e => {
                           //     console.log("e -- ", e.blocks.t)
                           //   }
                           //   validation.setFieldValue("bio", e.target.value)
+                          // }
+                          // value={bio}
+                          // onContentStateChange={value =>
+                          //   validation.setFieldValue("bio", value)
                           // }
                         />
                         <span className="text-danger">
@@ -572,6 +588,9 @@ const AddUser = () => {
         show={modalShow}
         onHide={() => setModalShow(false)}
         pest={pest}
+        onImageChange={val => {
+          validation.setFieldValue("profile_image", val)
+        }}
         tempImage={tempImage}
         setTempImage={setTempImage}
         setPest={setPest}
