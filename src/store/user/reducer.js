@@ -7,12 +7,13 @@ import {
   ADD_USER_FAIL,
   UPDATE_USER_SUCCESS,
   UPDATE_USER_FAIL,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_FAIL,
 } from "./actionTypes"
 
 const INIT_STATE = { user: [], next: "", prev: "", error: {} }
 
 const users = (state = INIT_STATE, action) => {
-  // console.log(action)
   switch (action.type) {
     case GET_USER_SUCCESS:
       return {
@@ -50,11 +51,7 @@ const users = (state = INIT_STATE, action) => {
     case UPDATE_USER_SUCCESS:
       return {
         ...state,
-        users: state.users.map(user =>
-          user.id.toString() === action.user.id.toString()
-            ? { user, ...action.payload }
-            : user
-        ),
+        users: action.payload
       }
 
     case UPDATE_USER_FAIL:
@@ -62,6 +59,20 @@ const users = (state = INIT_STATE, action) => {
         ...state,
         error: action.payload,
       }
+
+    case DELETE_USER_SUCCESS:
+      return {
+        ...state,
+        users: state.user.filter(
+          USER => USER.id.toString() !== action.payload.toString()
+        ),
+      };
+
+    case DELETE_USER_FAIL:
+      return {
+        ...state,
+        error: action.payload,
+      };
     default:
       return state
   }

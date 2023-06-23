@@ -17,10 +17,11 @@ import { FirstName, LastName, Email, IsActive, Id } from "./userlistCol"
 //Import Breadcrumb
 import Breadcrumbs from "components/Common/Breadcrumb"
 
-import { getAllUser } from "store/user/action"
+import { getAllUser,deleteUser } from "store/user/action"
 
 //redux
 import { useSelector, useDispatch } from "react-redux"
+import DeleteModal from "pages/Calendar/DeleteModal"
 
 const UsersList = props => {
   //meta title
@@ -146,8 +147,8 @@ const UsersList = props => {
                   to="#"
                   className="btn btn-sm btn-soft-danger"
                   onClick={() => {
-                    const jobData = cellProps.row.original
-                    onClickDelete(jobData)
+                    const id = cellProps.value
+                    onClickDelete(id)
                   }}
                 >
                   <i className="mdi mdi-delete-outline" id="deletetooltip" />
@@ -168,9 +169,30 @@ const UsersList = props => {
   const handleUserClicks = () => {
     navigate("/add-user")
   }
+  //delete order
+  const [deleteModal, setDeleteModal] = useState(false);
+    const [userId, setUserId] = useState();
 
+  const onClickDelete = (id) => {
+    console.log(id,"===========================")
+    setUserId(id);
+    setDeleteModal(true);
+  };
+
+  const handleDeleteUser = () => {
+    console.log("usererrrrrr--",userId)
+    if (userId) {
+      dispatch(deleteUser(userId));
+    }
+    setDeleteModal(false);
+  };
   return (
     <React.Fragment>
+      <DeleteModal
+        show={deleteModal}
+        onDeleteClick={handleDeleteUser}
+        onCloseClick={() => setDeleteModal(false)}
+      />
       <div className="page-content">
         <Container fluid>
           {/* Render Breadcrumbs */}

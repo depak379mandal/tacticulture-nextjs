@@ -8,6 +8,12 @@ import {
   ADD_NEW_USER,
   ADD_USER_SUCCESS,
   ADD_USER_FAIL,
+  UPDATE_USER_SUCCESS,
+  UPDATE_USER,
+  UPDATE_USER_FAIL,
+  DELETE_USER,
+  DELETE_USER_SUCCESS,
+  DELETE_USER_FAIL,
 } from "./actionTypes"
 
 /* USER LIST*/
@@ -58,20 +64,20 @@ export const updateUserDetailFail = error => ({
 })
 
 /* USER DELETE*/
-// export const deleteUser = user => ({
-//   type: DELETE_USER,
-//   payload: user,
-// })
+export const deleteUser = user => ({
+  type: DELETE_USER,
+  payload: user,
+})
 
-// export const deleteUserSuccess = user => ({
-//   type: DELETE_USER_SUCCESS,
-//   payload: user,
-// })
+export const deleteUserSuccess = user => ({
+  type: DELETE_USER_SUCCESS,
+  payload: user,
+})
 
-// export const deleteUserFail = error => ({
-//   type: DELETE_USER_FAIL,
-//   payload: error,
-// })
+export const deleteUserFail = error => ({
+  type: DELETE_USER_FAIL,
+  payload: error,
+})
 
 /* USER DETAIL*/
 export const getUserDetails = userId => ({

@@ -7,7 +7,10 @@ export const getAllUsers = page => get(page ? page : url.GET_USERS)
 export const addNewUser = user => post(url.ADD_NEW_USER, user)
 
 // update user
-export const updateUser = user => put(`${url.UPDATE_USER}/${user}`)
+export const updateUsers = user => put(`${url.UPDATE_USER}/${user.id}`,user)
 
 // get user details
 export const getUserDetail = id => get(`${url.GET_USERS_DETAILS}/${id}`)
+
+// delete user 
+export const deleteUsers = id => del(`${url.DELETE_USER}/${id}`)

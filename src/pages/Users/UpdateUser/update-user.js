@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 
 import {
   Form,
@@ -7,21 +7,27 @@ import {
   Col,
   Row,
   Container,
-  Label,
   Input,
   Button,
-  FormGroup,
 } from "reactstrap"
-
-// Form Editor
-import { Editor } from "react-draft-wysiwyg"
+import Select from "react-select"
 //Import Breadcrumb
 import Breadcrumbs from "../../../components/Common/Breadcrumb"
-import { getUserDetails, updateUserDetail } from "store/actions"
+import {
+  getEventCategory,
+  getUserDetails,
+  updateUserDetail,
+} from "store/actions"
 import { useParams } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { useFormik } from "formik"
 import * as Yup from "yup"
+import Cropmodal from "pages/Modal/Cropmodal"
+// image
+import Avtar_image from "../../../assets/images/users/avatar-1.jpg"
+//css
+import "../../../assets/scss/custom/pages/_add-user.scss"
+import TextEditor from "pages/TextEditor/text-editor"
 
 const UpdateUser = () => {
   //meta title
@@ -32,28 +38,19 @@ const UpdateUser = () => {
   const { user } = useSelector(state => ({
     user: state.User.userDetail,
   }))
+  const {error } = useSelector(state => state.User)
+
+  const { category } = useSelector(state => state.Event)
+
+  // state management
+  const [defaultServerImage, setDefaultServerImage] = useState('')
+
+  // console.log({defaultServerImage});
+
   useEffect(() => {
     dispatch(getUserDetails(id))
   }, [dispatch])
 
-  function replaceNullsWithEmptyStrings(obj) {
-    for (let key in obj) {
-      if (obj[key] === null) {
-        obj[key] = ""
-      } else if (typeof obj[key] === "object" && obj[key] !== null) {
-        replaceNullsWithEmptyStrings(obj[key])
-      }
-    }
-    return obj
-  }
-  useEffect(() => {
-    if (user) {
-      const newUser = replaceNullsWithEmptyStrings(user)
-      console.log(newUser)
-
-      validation.setValues(replaceNullsWithEmptyStrings(user))
-    }
-  }, [user])
 
   // validation
   const validation = useFormik({
@@ -61,20 +58,23 @@ const UpdateUser = () => {
     enableReinitialize: true,
 
     initialValues: {
+      id:"",
       first_name: "",
       last_name: "",
-      email: user?.email,
+      email: "",
       username: "",
       phone_number: "",
-      default_profile: user?.default_profile,
-      password: "",
+      default_profile: "",
+      // password: "",
       address: "",
       city: "",
       profile_image: "",
       zip_code: "",
       bio: "",
+      events: [],
     },
     validationSchema: Yup.object({
+      id:Yup.string(),
       first_name: Yup.string(),
       last_name: Yup.string(),
       email: Yup.string()
@@ -83,38 +83,120 @@ const UpdateUser = () => {
       username: Yup.string(),
       phone_number: Yup.string(),
       default_profile: Yup.string().required("Please select a role"),
-      password: Yup.string(),
+      // password: Yup.string(),
       address: Yup.string(),
       city: Yup.string(),
       zip_code: Yup.string(),
       bio: Yup.string(),
       profile_image: Yup.string(),
+      events: Yup.array().max(10, "Only 10 categories are allowed"),
     }),
 
     onSubmit: values => {
+      // console.log("values----", values)
       const updateUser = {
+        id: values["id"],
         first_name: values["first_name"],
         last_name: values["last_name"],
         email: values["email"],
         username: values["username"],
         phone_number: values["phone_number"],
         default_profile: values["default_profile"],
-        password: values["password"],
+        // password: values["password"],
         address: values["address"],
         city: values["city"],
-        profile_image: values["profile_image"] ? values["profile_image"] : null,
+        profile_image:  values["profile_image"]?values["profile_image"]:null ,
         zip_code: values["zip_code"],
         bio: values["bio"],
+        events: values["events"],
       }
-      console.log(updateUser, "[[[[[[[[[[[[[[[[[[[[[[[[[[")
+      if(values["profile_image"] === defaultServerImage) {
+        delete updateUser["profile_image"]
+      }
+      // console.log(updateUser, "[[[[[[[[[[[[[[[[[[[[[[[[[[")
       // save new user
       dispatch(updateUserDetail(updateUser))
-      validation.resetForm()
+      cosnole.log("dispatch user=----",user)
+       if (user) {
+        navigate("/users-list")
+      }
+      // validation.resetForm()
 
       toggle()
     },
   })
-  console.log(validation)
+
+    useEffect(() => {
+    if (error.message) {
+      const convertedErrors = {}
+      Object.entries(error.response?.data)
+        .map(([key, value]) => {
+          return {
+            [key]: value.join(),
+          }
+        })
+        .forEach(error => {
+          const field = Object.keys(error)[0] // Get the field name
+          const message = error[field] // Get the error message
+          convertedErrors[field] = message
+        })
+      validation.setErrors(convertedErrors)
+    }
+  }, [error])
+  
+  /* profile Image cropper */
+  const [pest, setPest] = useState("")
+  const [tempImage, setTempImage] = useState("")
+  const [modalShow, setModalShow] = React.useState(false)
+  useEffect(() => {
+    dispatch(getEventCategory())
+  }, [])
+  const [selectedMulti, setselectedMulti] = useState(null)
+  function handleMulti(selectedMulti) {
+    setselectedMulti(selectedMulti)
+  }
+
+  
+
+  function replaceNullsWithEmptyStrings(obj) {
+
+   
+    for (let key in obj) {
+      if (obj[key] === null) {
+        obj[key] = ""
+      } else if (typeof obj[key] === "object" && obj[key] !== null ) {
+       
+
+          replaceNullsWithEmptyStrings(obj[key])
+        
+      }
+    }
+    return obj
+  }
+
+  const newOptions = category?.map(item => ({
+    label: item.event_categories,
+    value: item.id,
+  }))
+  // console.log('validation -- formik --- ',validation.values, category)
+
+  useEffect(() => {
+    if (user) {
+      const newUser = replaceNullsWithEmptyStrings(user)
+      setDefaultServerImage(newUser?.profile_image)
+      
+      
+       const eventCats = newUser?.events?.map(item => {
+        return {
+          label: category?.find(el => el.id === item)?.event_categories,
+          value: item
+        }
+      })
+      handleMulti(eventCats)
+      validation.setValues(replaceNullsWithEmptyStrings(newUser))
+      
+    }
+  }, [user,category])
   return (
     <React.Fragment>
       <div className="page-content">
@@ -155,6 +237,10 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.first_name &&
+                            validation.errors.first_name}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -180,6 +266,10 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.last_name &&
+                            validation.errors.last_name}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -204,6 +294,9 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.email && validation.errors.email}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -217,7 +310,7 @@ const UpdateUser = () => {
                         <Input
                           name="username"
                           className="form-control"
-                          type="url"
+                          type="text"
                           value={validation.values?.username}
                           placeholder="Insert Username"
                           onChange={validation.handleChange}
@@ -229,6 +322,10 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.username &&
+                            validation.errors.username}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -254,9 +351,41 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.phone_number &&
+                            validation.errors.phone_number}
+                        </span>
                       </div>
                     </Row>
-
+                    {/* <Row className="mb-3">
+                      <label
+                        htmlFor="example-password-input"
+                        className="col-md-2 col-form-label"
+                      >
+                        Password
+                      </label>
+                      <div className="col-md-10">
+                        <Input
+                          name="password"
+                          className="form-control"
+                          type="password"
+                          placeholder="Insert Password"
+                          onChange={validation.handleChange}
+                          onBlur={validation.handleBlur}
+                          value={validation.values.password || ""}
+                          invalid={
+                            validation.touched.password &&
+                            validation.errors.password
+                              ? true
+                              : false
+                          }
+                        />
+                        <span className="text-danger">
+                          {validation.touched.password &&
+                            validation.errors.password}
+                        </span>
+                      </div>
+                    </Row> */}
                     <Row className="mb-3">
                       <label className="col-md-2 col-form-label">
                         Default Role
@@ -276,6 +405,10 @@ const UpdateUser = () => {
                           <option>apprentice</option>
                           <option>instructor</option>
                         </select>
+                        <span className="text-danger">
+                          {validation.touched.default_profile &&
+                            validation.errors.default_profile}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -283,11 +416,42 @@ const UpdateUser = () => {
                         Profile Image
                       </label>
                       <div className="col-md-10">
-                        <Input
+                        {/* <Input
                           className="form-control"
                           type="file"
                           id="formFile"
-                        />
+                        /> */}
+                        <div className="">
+                          <div className="">
+                            <img
+                              src={validation.values?.profile_image?validation.values?.profile_image:pest ? pest : Avtar_image}
+                              className="profile_image_adduser"
+                              alt="image"
+                            />
+                          </div>
+
+                          <input
+                            type="file"
+                            id="actual-btn"
+                            onChange={e => {
+                              if (e.target.files.length > 0) {
+                                setTempImage(e)
+                                setModalShow(true)
+                              }
+                            }}
+                            hidden
+                          />
+                          <label
+                            htmlFor="actual-btn"
+                            className="select_image_button"
+                          >
+                            Choose Image
+                          </label>
+                        </div>
+                         <span className="text-danger">
+                          {validation.touched.profile_image &&
+                            validation.errors.profile_image}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -313,6 +477,10 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.address &&
+                            validation.errors.address}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -337,6 +505,9 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.city && validation.errors.city}
+                        </span>
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -362,6 +533,35 @@ const UpdateUser = () => {
                               : false
                           }
                         />
+                        <span className="text-danger">
+                          {validation.touched.zip_code &&
+                            validation.errors.zip_code}
+                        </span>
+                      </div>
+                    </Row>
+                    <Row className="mb-3">
+                      <label
+                        htmlFor="example-text-input"
+                        className="col-md-2 col-form-label"
+                      >
+                        Event Interest
+                      </label>
+                      <div className="col-md-10">
+                        <Select
+                          name="events"
+                          value={selectedMulti}
+                          isMulti={true}
+                          onChange={val => {
+                      
+                            handleMulti(val)
+                            validation.setFieldValue(
+                              "events",
+                              val.map(item => item.value)
+                            )
+                          }}
+                          options={newOptions}
+                          className="select2-selection"
+                        />
                       </div>
                     </Row>
                     <Row className="mb-3">
@@ -372,10 +572,9 @@ const UpdateUser = () => {
                         Bio
                       </label>
                       <div className="col-md-10">
-                        <Editor
-                          toolbarClassName="toolbarClassName"
-                          wrapperClassName="wrapperClassName"
-                          editorClassName="editorClassName"
+                        <TextEditor
+                        value={validation.values.bio}
+                        onChange={(val)=>validation.setFieldValue("bio",val)}
                         />
                       </div>
                     </Row>
@@ -395,6 +594,17 @@ const UpdateUser = () => {
           </Row>
         </Container>
       </div>
+      <Cropmodal
+        show={modalShow}
+        onHide={() => setModalShow(false)}
+        pest={pest}
+        onImageChange={val => {
+          validation.setFieldValue("profile_image", val)
+        }}
+        tempImage={tempImage}
+        setTempImage={setTempImage}
+        setPest={setPest}
+      />
     </React.Fragment>
   )
 }

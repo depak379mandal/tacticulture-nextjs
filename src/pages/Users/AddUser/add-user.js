@@ -27,6 +27,7 @@ import Avtar_image from "../../../assets/images/users/avatar-1.jpg"
 //css
 import "../../../assets/scss/custom/pages/_add-user.scss"
 import { getEventCategory } from "store/events/actions"
+import TextEditor from "pages/TextEditor/text-editor"
 
 const AddUser = () => {
   //meta title
@@ -128,7 +129,6 @@ const AddUser = () => {
   const [pest, setPest] = useState("")
   const [tempImage, setTempImage] = useState("")
   const [modalShow, setModalShow] = React.useState(false)
-  console.log(pest, "kskdjhgihfgh")
   const onChange = e => {
     e.preventDefault()
     let files
@@ -273,7 +273,7 @@ const AddUser = () => {
                         <Input
                           name="username"
                           className="form-control"
-                          type="url"
+                          type="text"
                           placeholder="Insert Username"
                           onChange={validation.handleChange}
                           onBlur={validation.handleBlur}
@@ -546,22 +546,9 @@ const AddUser = () => {
                         Bio
                       </label>
                       <div className="col-md-10">
-                        <Editor
-                          toolbarClassName="toolbarClassName"
-                          wrapperClassName="wrapperClassName"
-                          editorClassName="editorClassName"
-                          // initialContentState={validation.values.bio}
-                          // value={validation.values.bio}
-                          // onChange={
-                          //   e => {
-                          //     console.log("e -- ", e.blocks.t)
-                          //   }
-                          //   validation.setFieldValue("bio", e.target.value)
-                          // }
-                          // value={bio}
-                          // onContentStateChange={value =>
-                          //   validation.setFieldValue("bio", value)
-                          // }
+                         <TextEditor
+                        value={validation.values.bio || ""}
+                        onChange={(val)=>validation.setFieldValue("bio",val)}
                         />
                         <span className="text-danger">
                           {validation.touched.bio && validation.errors.bio}
