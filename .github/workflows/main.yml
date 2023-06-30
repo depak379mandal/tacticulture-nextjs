@@ -33,4 +33,4 @@ jobs:
           cd /home/user/tecticulture/admin_tecticulture/ 
           git pull origin master
           /home/user/.yarn/bin/yarn install
-          pm2 restart 66
+          pm2 restart 51
