@@ -173,7 +173,7 @@ import Pages500 from "../pages/Utility/pages-500"
 //Contacts
 import ContactsGrid from "../pages/Contacts/contacts-grid"
 import ContactsList from "../pages/Contacts/ContactList/contacts-list"
-import UsersList from "../pages/Users/UsersList/user-list"
+import UsersList from "../pages/Users/UsersList"
 import EventsList from "../pages/Events/EventsList/event-list"
 
 import ContactsProfile from "../pages/Contacts/ContactsProfile/contacts-profile"

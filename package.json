@@ -39,6 +39,7 @@
     "metismenujs": "^1.3.1",
     "moment": "^2.29.4",
     "namor": "^2.0.4",
+    "next": "^13.4.19",
     "node-sass": "^8.0.0",
     "nouislider-react": "^3.4.1",
     "prop-types": "^15.8.1",
@@ -86,6 +87,7 @@
     "redux": "^4.2.0",
     "redux-form": "^8.3.8",
     "redux-saga": "^1.2.2",
+    "sass": "^1.66.1",
     "simplebar-react": "^2.4.1",
     "swiper": "^8.4.5",
     "toastr": "^2.1.4",
@@ -98,7 +100,11 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write \"**/*.{js,jsx,json,md,html,css,less,scss}\"",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "next:dev": "next dev",
+    "next:build": "next build",
+    "next:start": "next start",
+    "next:lint": "next lint"
   },
   "eslintConfig": {
     "extends": [
